@@ -5,20 +5,20 @@ A simple web service that provides IP address location information using free da
 
 ### Requirements
 
-Windows 10 or compatible operating system.
+Windows 10 or compatible operating system.  
 Approximately 2 GB of free space will be required.
 
 ### Download IP2Location LITE DB11 Data
 
 We aren't allowed to redistribute the location database, and we wouldn't want to anyway.  It is relatively large and updated often.  So you will need to get it yourself.
 
-1. Go to [https://lite.ip2location.com/](https://lite.ip2location.com/) and download CSV versions of DB11.LITE.  You may obtain IPv4 and/or IPv6 versions of the data depending on which type of addresses you plan to query.  (both are supported)
+1. Go to [https://lite.ip2location.com/](https://lite.ip2location.com/) and download CSV versions of DB11.LITE.  You may obtain IPv4 and/or IPv6 versions of the data depending on which type of addresses you plan to query.  (both are supported)  
 2. Extract the .csv files from the zip archives.
 
 ### Install GeolocationWebService
 
-1. Download a release from [the releases tab](https://github.com/bp2008/GeolocationWebService/releases).
-2. Extract the zip wherever you like.
+1. Download a release from [the releases tab](https://github.com/bp2008/GeolocationWebService/releases).  
+2. Extract the zip wherever you like.  
 3. Run `GeolocationWebService.exe`.
 
 ![screenshot](https://i.imgur.com/fLNGMWG.png)
@@ -27,8 +27,12 @@ We aren't allowed to redistribute the location database, and we wouldn't want to
 
 ### Import location data
 
-1. Reopen `GeolocationWebService.exe` and click "Import IPv4 Geolocation Data" and/or "Import IPv6 Geolocation Data" buttons to begin the data import procedure.
+1. Reopen `GeolocationWebService.exe` and click "Import IPv4 Geolocation Data" and/or "Import IPv6 Geolocation Data" buttons to begin the data import procedure.  
 2. Browse to the correct .csv file and begin the import.  This should take around one minute or less depending on your CPU and disk speed.
+
+### Run as a Windows Service
+
+1. Use the `Install Service` and `Start Service` buttons to manage the Windows service.  If you want to move the program, you will need to uninstall and reinstall using the provided buttons.
 
 ## Usage
 
@@ -42,7 +46,7 @@ Open the web service (if you are not sure how, there is an `Open Web Interface` 
 
 You will probably want to utilize the JSON endpoint for integration with your own software.
 
-Example:
+Example:  
 ```
 /ip/8.8.8.8
 ```
