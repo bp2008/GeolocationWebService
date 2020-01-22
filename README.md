@@ -70,3 +70,6 @@ The maximum zoom level is 5. `/map/5/8.8.8.8.jpg`
 
 **Note about zoom**: The mapping function is not very efficient, loading an image of the entire earth and cropping it.  To help avoid excessive resource consumption, only one request at a time will be fulfilled for maps at zoom levels 3-5.
 
+## Building From Source
+
+To build from source, clone the repository and also my [BPUtil repository](https://github.com/bp2008/BPUtil).  Open in Visual Studio 2019 community edition.  You may need to remove and re-add the `BPUtil` project to the solution, and add `BPUtil` as a reference in the `GeolocationWebService` project.
