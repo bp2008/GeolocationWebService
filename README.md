@@ -16,7 +16,7 @@ We aren't allowed to redistribute the location database, and we wouldn't want to
 
 There are separate files for IPv4 and IPv6, *but you only need one of them*.
 
-To support IPv4 and IPv6 addresses, download only the DB11.LITE **IPV6 CSV** file from the link above. This can be used to resolve both IPv4 and IPv6 addresses.  
+To support IPv4 and IPv6 addresses, download only the DB11.LITE **IPV6 CSV** file from the link above. This includes all IPv4 addresses mapped to IPv6, and therefore can be used to resolve both IPv4 and IPv6 addresses.  
 
 If you need only IPv4 support, you can save a little disk space by getting only the DB11.LITE **IPV4 CSV**.
 
