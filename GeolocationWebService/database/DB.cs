@@ -112,6 +112,12 @@ namespace GeolocationWebService.database
 		/// <returns></returns>
 		public IPv4Record GetIPv4Record(uint ipv4Address)
 		{
+			if (Program.settings.resolveIPv4WithIPv6Table)
+			{
+				BigInteger ipno = new BigInteger((((ulong)ipv4Address) | 0xFFFF00000000));
+				IPv6Record v6 = GetIPv6Record(ipno);
+				return new IPv4Record(v6);
+			}
 			lock (syncLock)
 			{
 				return db.Query<IPv4Record>("SELECT * FROM IPv4Record WHERE ip_to >= ? LIMIT 1", ipv4Address).FirstOrDefault();
@@ -125,14 +131,53 @@ namespace GeolocationWebService.database
 		/// <returns></returns>
 		public IPv6Record GetIPv6Record(IPAddress ip)
 		{
-			byte[] data = ip.GetAddressBytes().Reverse().ToArray();
-			BigInteger ipno = new BigInteger(data);
+			byte[] dataLE = ip.GetAddressBytes().Reverse().ToArray();
+			BigInteger ipno = new BigInteger(dataLE);
+			return GetIPv6Record(ipno);
+		}
+
+		/// <summary>
+		/// Returns the IPv6Record containing the specified address, or null. (null should be impossible if the database is correctly formed and the given ipv6 address is valid)
+		/// </summary>
+		/// <param name="ipv6Address">The ipv6 address.</param>
+		/// <returns></returns>
+		public IPv6Record GetIPv6Record(BigInteger ipno)
+		{
 			lock (syncLock)
 			{
-				return db.Query<IPv6Record>("SELECT * FROM IPv6Record WHERE ip_to >= '?' LIMIT 1", ipno.ToString().PadLeft(39, '0')).FirstOrDefault();
+				return db.Query<IPv6Record>("SELECT * FROM IPv6Record WHERE ip_to >= ? LIMIT 1", ipno.ToString().PadLeft(39, '0')).FirstOrDefault();
 			}
 		}
 
+		/// <summary>
+		/// Imports data from the specified csv, automatically determining whether the data contains IPv4 or IPv6 addresses by scanning (up to) the first 1000 rows and looking for any IP address number larger than int.MaxValue.
+		/// </summary>
+		/// <param name="csvPath"></param>
+		/// <param name="bw"></param>
+		public void ImportData(string csvPath, BackgroundWorker bw)
+		{
+			bool isIpv6Data = false;
+			using (StreamReader sr = new StreamReader(csvPath))
+			{
+				IEnumerable<string[]> rows = CSVFile.StreamingRead(sr);
+				int i = 0;
+				foreach (string[] row in rows)
+				{
+					// index 0 (ip_from) is always smaller than index 1 (ip_to), so we only need to look at index 1.
+					if (long.Parse(row[1]) > int.MaxValue)
+					{
+						isIpv6Data = true;
+						break;
+					}
+					else if (i++ > 1000)
+						break;
+				}
+			}
+			if (isIpv6Data)
+				ImportIPv6Data(csvPath, bw);
+			else
+				ImportIPv4Data(csvPath, bw);
+		}
 		public void ImportIPv4Data(string fileName, BackgroundWorker bw)
 		{
 			ImportIPData(fileName, bw, MakeIPv4Record);

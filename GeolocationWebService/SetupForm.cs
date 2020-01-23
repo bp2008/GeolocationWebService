@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -13,12 +14,13 @@ using System.Windows.Forms;
 
 namespace GeolocationWebService
 {
-	public partial class ImportDataForm : SelfCenteredForm
+	public partial class SetupForm : SelfCenteredForm
 	{
-		public ImportDataForm()
+		public SetupForm()
 		{
 			InitializeComponent();
 			openFileDialog1.InitialDirectory = Globals.ApplicationDirectoryBase;
+			LoadFromSettings();
 		}
 
 		private void btnBrowse_Click(object sender, EventArgs e)
@@ -28,32 +30,11 @@ namespace GeolocationWebService
 				txtFilePath.Text = openFileDialog1.FileName;
 		}
 
-
-		private string ipVersion;
-		public string IpVersion
-		{
-			get
-			{
-				return ipVersion;
-			}
-			set
-			{
-				ipVersion = value;
-				this.Text = "Import " + ipVersion + " Data";
-				this.label1.Text = "IP2Location DB11.LITE " + ipVersion + " CSV:";
-			}
-		}
 		private string csvPath;
 		BackgroundWorker bw;
 		bool lastImportHadError = false;
 		private void btnImportNow_Click(object sender, EventArgs e)
 		{
-			if (ipVersion != "IPv4" && ipVersion != "IPv6")
-			{
-				MessageBox.Show("Application error. Invalid ipVersion.");
-				return;
-			}
-
 			if (!File.Exists(txtFilePath.Text))
 			{
 				MessageBox.Show("The specified file does not exist!");
@@ -83,10 +64,7 @@ namespace GeolocationWebService
 		{
 			try
 			{
-				if (ipVersion == "IPv4")
-					Program.db.ImportIPv4Data(csvPath, bw);
-				else if (ipVersion == "IPv6")
-					Program.db.ImportIPv6Data(csvPath, bw);
+				Program.db.ImportData(csvPath, bw);
 			}
 			catch (Exception ex)
 			{
@@ -119,6 +97,27 @@ namespace GeolocationWebService
 				bw.CancelAsync();
 				MessageBox.Show("Canceled data import before completion. Please repeat the import later, otherwise the database will be incomplete.");
 			}
+		}
+
+		private void linkToDataSite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			Process.Start(linkToDataSite.Text);
+		}
+
+		private void cbResolveIPv4WithIPv6Table_CheckedChanged(object sender, EventArgs e)
+		{
+			SaveSettings();
+		}
+
+		private void LoadFromSettings()
+		{
+			cbResolveIPv4WithIPv6Table.Checked = Program.settings.resolveIPv4WithIPv6Table;
+		}
+
+		private void SaveSettings()
+		{
+			Program.settings.resolveIPv4WithIPv6Table = cbResolveIPv4WithIPv6Table.Checked;
+			Program.settings.Save();
 		}
 	}
 }

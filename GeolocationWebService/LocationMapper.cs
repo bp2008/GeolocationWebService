@@ -1,5 +1,6 @@
 ﻿using GeolocationWebService.database;
 using Microsoft.MapPoint;
+using System;
 using System.Drawing;
 using System.IO;
 
@@ -14,6 +15,10 @@ namespace GeolocationWebService
 		{
 			this.imgData = imgData;
 			this.mimeType = mimeType;
+		}
+		public string ToDataUri()
+		{
+			return "data:" + mimeType + ";base64," + Convert.ToBase64String(imgData);
 		}
 	}
 	public static class LocationMapper

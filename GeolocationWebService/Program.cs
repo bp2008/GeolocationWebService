@@ -41,8 +41,7 @@ namespace GeolocationWebService
 				string Title = "GeolocationWebService " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + " Service Manager";
 				string ServiceName = "GeolocationWebService";
 				ButtonDefinition[] additionalButtons = new ButtonDefinition[] {
-					new ButtonDefinition("Import IPv4 Geolocation Data", btnImportIPv4GeolocationData_Click),
-					new ButtonDefinition("Import IPv6 Geolocation Data", btnImportIPv6GeolocationData_Click),
+					new ButtonDefinition("Setup", btnImportGeolocationData_Click),
 					new ButtonDefinition("Open Web Interface", btnOpenWebInterface_Click)
 				};
 
@@ -67,16 +66,9 @@ namespace GeolocationWebService
 			}
 		}
 
-		private static void btnImportIPv4GeolocationData_Click(object sender, EventArgs e)
+		private static void btnImportGeolocationData_Click(object sender, EventArgs e)
 		{
-			ImportDataForm idf = new ImportDataForm();
-			idf.IpVersion = "IPv4";
-			idf.Show(((Control)sender).Parent);
-		}
-		private static void btnImportIPv6GeolocationData_Click(object sender, EventArgs e)
-		{
-			ImportDataForm idf = new ImportDataForm();
-			idf.IpVersion = "IPv6";
+			SetupForm idf = new SetupForm();
 			idf.Show(((Control)sender).Parent);
 		}
 

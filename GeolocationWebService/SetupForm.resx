@@ -120,4 +120,10 @@
   <metadata name="openFileDialog1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="label4.Text" xml:space="preserve">
+    <value>If you want to support IPv4 and IPv6 addresses, download only the DB11.LITE IPV6 CSV file from the link above.  This can be used to resolve both IPv4 and IPv6 addresses.
+
+If you need only IPv4 support, you can save a little disk space by getting only the DB11.LITE IPV4 CSV. If you import the IPV4 CSV, make sure the service is not configured to resolve IPv4 queries with the IPv6 table.
+</value>
+  </data>
 </root>

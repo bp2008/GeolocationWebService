@@ -40,6 +40,8 @@ namespace GeolocationWebService
 					p.outputStream.WriteLine("<h2>Examples</h2>");
 					p.outputStream.WriteLine("<h3>HTML Page</h3>");
 					p.outputStream.WriteLine("<p><a href=\"whois/8.8.8.8\">whois/8.8.8.8</a></p>");
+					p.outputStream.WriteLine("<h3>HTML Embed</h3>");
+					p.outputStream.WriteLine("<p><a href=\"embed/8.8.8.8\">embed/8.8.8.8</a></p>");
 					p.outputStream.WriteLine("<h3>JSON Record</h3>");
 					p.outputStream.WriteLine("<p><a href=\"ip/8.8.8.8\">ip/8.8.8.8</a> (or <a href=\"ip/8.8.8.8.json\">ip/8.8.8.8.json</a>)</p>");
 					p.outputStream.WriteLine("<h3>Location on Map</h3>");
@@ -68,7 +70,7 @@ namespace GeolocationWebService
 						p.writeFailure();
 					else
 					{
-						p.writeSuccess();
+						p.writeSuccess(additionalHeaders: CoordsHeader(record));
 						p.outputStream.WriteLine("<html>");
 						p.outputStream.WriteLine("<head>");
 						p.outputStream.WriteLine("<title>Geolocation Web Service</title>");
@@ -101,7 +103,57 @@ namespace GeolocationWebService
 						p.outputStream.WriteLine("</body>");
 						p.outputStream.WriteLine("</html>");
 					}
-
+				}
+				else if (p.requestedPage.StartsWith("embed/"))
+				{
+					string input = p.requestedPage.Substring("embed/".Length);
+					IPRecord record = Program.db.GetIPRecord(input);
+					if (record == null)
+						p.writeFailure();
+					else
+					{
+						LocationMap map = LocationMapper.GetMap(record, 1, 256, 256);
+						p.writeSuccess(additionalHeaders: CoordsHeader(record));
+						p.outputStream.WriteLine("<style type=\"text/css\">");
+						p.outputStream.WriteLine(".gwsembed { font-family: sans-serif; }");
+						p.outputStream.WriteLine(".gwsembed .heading { font-size: 1.3em; font-weight: bold; margin: 3px 0px 8px 0px }");
+						p.outputStream.WriteLine(".gwsembed .data { display: inline-block; vertical-align: top; margin-right: 5px; margin-bottom: 5px; font-family: consolas, monospace; }");
+						p.outputStream.WriteLine(".gwsembed .physical_address { white-space: pre-wrap; }");
+						p.outputStream.WriteLine(".gwsembed table { border-collapse: collapse; margin-top: 5px;}");
+						p.outputStream.WriteLine(".gwsembed td { border: 1px solid black; padding: 2px 5px; }");
+						p.outputStream.WriteLine(".gwsembed .img { width: 256px; height: 256px; display: inline-block; vertical-align: top; }");
+						p.outputStream.WriteLine(".gwsembed .body > div, .gwsembed .body > p { margin: 5px 0px; }");
+						p.outputStream.WriteLine("</style>");
+						p.outputStream.WriteLine("<div class=\"gwsembed\">");
+						if (!p.GetBoolParam("hideTitle"))
+							p.outputStream.WriteLine("<div class=\"heading\">Geolocation for " + input + "</div>");
+						p.outputStream.WriteLine("<div class=\"body\">");
+						p.outputStream.WriteLine("<div class=\"info\">");
+						p.outputStream.WriteLine("<div class=\"data\">");
+						p.outputStream.Write("<div class=\"physical_address\">");
+						p.outputStream.WriteLine(record.city_name + ", " + record.region_name + "  " + record.zip_code);
+						p.outputStream.Write(record.country_code + " (" + record.country_name + ")");
+						p.outputStream.WriteLine("</div>"); // end physical_address
+						p.outputStream.WriteLine("<table>");
+						p.outputStream.WriteLine("<tbody>");
+						p.outputStream.WriteLine("<tr><td>Latitude</td><td>" + record.latitude + "</td></tr>");
+						p.outputStream.WriteLine("<tr><td>Longitude</td><td>" + record.longitude + "</td></tr>");
+						p.outputStream.WriteLine("<tr><td>City</td><td>" + record.city_name + "</td></tr>");
+						p.outputStream.WriteLine("<tr><td>Region</td><td>" + record.region_name + "</td></tr>");
+						p.outputStream.WriteLine("<tr><td>Country</td><td>" + record.country_code + "</td></tr>");
+						p.outputStream.WriteLine("<tr><td>Country Name</td><td>" + record.country_name + "</td></tr>");
+						p.outputStream.WriteLine("<tr><td>Zip Code</td><td>" + record.zip_code + "</td></tr>");
+						p.outputStream.WriteLine("<tr><td>Time Zone</td><td>" + record.time_zone + "</td></tr>");
+						p.outputStream.WriteLine("</tbody>");
+						p.outputStream.WriteLine("</table>");
+						p.outputStream.WriteLine("</div>"); // end data
+						p.outputStream.WriteLine("<img src=\"" + map.ToDataUri() + "\" alt=\"map\"/>");
+						p.outputStream.WriteLine("</div>"); // end info
+						p.outputStream.WriteLine("<p>This information includes IP2Location LITE data available from <a href=\"http://www.ip2location.com\">http://www.ip2location.com</a>.</p>");
+						p.outputStream.WriteLine("<p>Map data is <a href=\"https://www.openstreetmap.org/copyright\">© OpenStreetMap contributors and cartography is licensed as CC BY-SA.</a></p>");
+						p.outputStream.WriteLine("</div>"); // end body
+						p.outputStream.WriteLine("</div>"); // end gwsembed
+					}
 				}
 				else if (p.requestedPage.StartsWith("ip/"))
 				{
@@ -133,7 +185,7 @@ namespace GeolocationWebService
 						else
 						{
 							LocationMap map = LocationMapper.GetMap(record, zoomLevel, 256, 256);
-							p.writeSuccess(map.mimeType, map.imgData.Length);
+							p.writeSuccess(map.mimeType, map.imgData.Length, additionalHeaders: CoordsHeader(record));
 							p.outputStream.Flush();
 							p.tcpStream.Write(map.imgData, 0, map.imgData.Length);
 						}
@@ -152,7 +204,7 @@ namespace GeolocationWebService
 							record.longitude = lon;
 
 							LocationMap map = LocationMapper.GetMap(record, zoomLevel, 256, 256);
-							p.writeSuccess(map.mimeType, map.imgData.Length);
+							p.writeSuccess(map.mimeType, map.imgData.Length, additionalHeaders: CoordsHeader(record));
 							p.outputStream.Flush();
 							p.tcpStream.Write(map.imgData, 0, map.imgData.Length);
 						}
@@ -163,6 +215,10 @@ namespace GeolocationWebService
 			{
 				p.writeFailure("500 Internal Server Error", ex.ToString());
 			}
+		}
+		private List<KeyValuePair<string, string>> CoordsHeader(IPRecord record)
+		{
+			return new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("Coords", record.latitude + "," + record.longitude) };
 		}
 
 		public override void handlePOSTRequest(HttpProcessor p, StreamReader inputData)
