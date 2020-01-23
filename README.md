@@ -12,8 +12,15 @@ Approximately 2 GB of free space will be required.
 
 We aren't allowed to redistribute the location database, and we wouldn't want to anyway.  It is relatively large and updated often.  So you will need to get it yourself.
 
-1. Go to [https://lite.ip2location.com/](https://lite.ip2location.com/) and download CSV versions of DB11.LITE.  You may obtain IPv4 and/or IPv6 versions of the data depending on which type of addresses you plan to query.  (both are supported)  
-2. Extract the .csv files from the zip archives.
+1. Go to [https://lite.ip2location.com/](https://lite.ip2location.com/) and locate DB11.LITE.
+
+There are separate files for IPv4 and IPv6, *but you only need one of them*.
+
+To support IPv4 and IPv6 addresses, download only the DB11.LITE **IPV6 CSV** file from the link above. This can be used to resolve both IPv4 and IPv6 addresses.  
+
+If you need only IPv4 support, you can save a little disk space by getting only the DB11.LITE **IPV4 CSV**.
+
+2. Extract the .csv file from the zip archive.
 
 ### Install GeolocationWebService
 
@@ -21,14 +28,15 @@ We aren't allowed to redistribute the location database, and we wouldn't want to
 2. Extract the zip wherever you like.  
 3. Run `GeolocationWebService.exe`.
 
-![screenshot](https://i.imgur.com/fLNGMWG.png)
+![screenshot](https://i.imgur.com/cGJY2bD.png)
 
 4. Close the service manager. Note the `Settings.cfg` which has been created next to the executable.  You may configure the HTTP or HTTPS listening ports here, or use the default HTTP port of 52280.
 
 ### Import location data
 
-1. Reopen `GeolocationWebService.exe` and click "Import IPv4 Geolocation Data" and/or "Import IPv6 Geolocation Data" buttons to begin the data import procedure.  
-2. Browse to the correct .csv file and begin the import.  This should take around one minute or less depending on your CPU and disk speed.
+1. Reopen `GeolocationWebService.exe` and click "Setup".
+2. Browse to the .csv file you exported, and begin the import.  This should take around one minute or less depending on your CPU and disk speed.
+3. If you imported the IPv4 table, uncheck the box "Resolve IPv4 queries with the IPv6 table".  If you imported the IPv6 table, leave the box checked.
 
 ### Run as a Windows Service
 
