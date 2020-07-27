@@ -45,14 +45,17 @@ namespace GeolocationWebService.database
 		public IPRecord() { }
 		public IPRecord(IPRecord copyFrom)
 		{
-			country_code = copyFrom.country_code;
-			country_name = copyFrom.country_name;
-			region_name = copyFrom.region_name;
-			city_name = copyFrom.city_name;
-			latitude = copyFrom.latitude;
-			longitude = copyFrom.longitude;
-			zip_code = copyFrom.zip_code;
-			time_zone = copyFrom.time_zone;
+			if (copyFrom != null)
+			{
+				country_code = copyFrom.country_code;
+				country_name = copyFrom.country_name;
+				region_name = copyFrom.region_name;
+				city_name = copyFrom.city_name;
+				latitude = copyFrom.latitude;
+				longitude = copyFrom.longitude;
+				zip_code = copyFrom.zip_code;
+				time_zone = copyFrom.time_zone;
+			}
 		}
 	}
 	public class IPv4Record : IPRecord
